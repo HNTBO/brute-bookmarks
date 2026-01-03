@@ -9,6 +9,13 @@ Thumbs.db
 *.swo
 *~
 
+# Dependencies
+node_modules/
+package-lock.json
+
+# Icons directory (user uploaded/downloaded icons)
+icons/
+
 # Logs
 *.log
 logs/
@@ -20,3 +27,7 @@ logs/
 # Temporary files
 *.tmp
 .cache/
+
+# Environment variables
+.env
+.env.local
