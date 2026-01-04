@@ -16,6 +16,9 @@ package-lock.json
 # Icons directory (user uploaded/downloaded icons)
 icons/
 
+# Data directory (user bookmarks - stored on server)
+data/
+
 # Logs
 *.log
 logs/

@@ -33,10 +33,10 @@
 
             /* Borders and lines */
             --border: #2a2a2a;
-            --border-strong: #3a3a3a;
+            --border-strong: #947c33;
 
             /* Typography */
-            --font-display: 'DM Serif Display', Georgia, serif;
+            --font-display: 'Outfit', Georgia, serif;
             --font-body: 'Outfit', -apple-system, sans-serif;
 
             /* Spacing system */
@@ -126,7 +126,7 @@
         }
 
         h1 em {
-            font-style: italic;
+            font-style: normal;
             color: var(--text-secondary);
         }
 
@@ -237,12 +237,6 @@
             color: var(--text-primary);
         }
 
-        .category-count {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-left: var(--space-sm);
-        }
-
         .category-actions {
             display: flex;
             gap: var(--space-xs);
@@ -283,7 +277,7 @@
         .bookmark-card:hover {
             background: var(--bg-hover);
             border-color: var(--accent);
-            transform: translate(-4px, -4px);
+            transform: translate(-0px, -2px);
             box-shadow: var(--shadow-md);
         }
 
@@ -323,7 +317,7 @@
 
         .bookmark-card:hover .bookmark-icon {
             filter: grayscale(0%);
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
 
         .bookmark-title {
@@ -920,8 +914,7 @@
     <div class="container">
         <header>
             <div class="brand">
-                <span class="brand-label">Dashboard</span>
-                <h1>Speed <em>Dial</em></h1>
+                <h1>Bookmark <em>Grid</em></h1>
             </div>
             <div class="controls">
                 <div class="size-control">
@@ -1051,47 +1044,28 @@
             localStorage.setItem('cardSize', currentCardSize);
         }
 
-        // Initialize with default data
-        function initializeData() {
-            const savedData = localStorage.getItem('speedDialData');
-            if (savedData) {
-                categories = JSON.parse(savedData);
-            } else {
-                // Default categories
-                categories = [
-                    {
-                        id: 'productivity',
-                        name: 'Productivity',
-                        bookmarks: [
-                            { id: 'b1', title: 'Clockify', url: 'https://app.clockify.me', iconPath: null },
-                            { id: 'b2', title: 'Todoist', url: 'https://todoist.com', iconPath: null },
-                            { id: 'b3', title: 'Notion', url: 'https://www.notion.so', iconPath: null },
-                            { id: 'b4', title: 'TypingClub', url: 'https://www.typingclub.com', iconPath: null }
-                        ]
-                    },
-                    {
-                        id: 'google',
-                        name: 'Google Services',
-                        bookmarks: [
-                            { id: 'g1', title: 'Gmail', url: 'https://mail.google.com', iconPath: null },
-                            { id: 'g2', title: 'Google Drive', url: 'https://drive.google.com', iconPath: null },
-                            { id: 'g3', title: 'Google Calendar', url: 'https://calendar.google.com', iconPath: null },
-                            { id: 'g4', title: 'Google Photos', url: 'https://photos.google.com', iconPath: null }
-                        ]
-                    },
-                    {
-                        id: 'ai',
-                        name: 'AI Tools',
-                        bookmarks: [
-                            { id: 'ai1', title: 'ChatGPT', url: 'https://chat.openai.com', iconPath: null },
-                            { id: 'ai2', title: 'Gemini', url: 'https://gemini.google.com', iconPath: null }
-                        ]
-                    }
-                ];
-                saveData();
+        // Initialize with data from server
+        async function initializeData() {
+            try {
+                // Try to load from server first
+                const response = await fetch(`${API_BASE}/api/data`);
+                if (response.ok) {
+                    categories = await response.json();
+                } else {
+                    throw new Error('Server returned error');
+                }
+            } catch (error) {
+                console.warn('Failed to load from server, using localStorage fallback:', error);
+                // Fallback to localStorage
+                const savedData = localStorage.getItem('speedDialData');
+                if (savedData) {
+                    categories = JSON.parse(savedData);
+                } else {
+                    categories = [];
+                }
             }
 
-            // Restore saved card size
+            // Restore saved card size (keep in localStorage as it's a UI preference)
             const savedSize = localStorage.getItem('cardSize');
             if (savedSize) {
                 currentCardSize = parseInt(savedSize);
@@ -1106,9 +1080,23 @@
             }
         }
 
-        // Save data to localStorage
-        function saveData() {
+        // Save data to server (with localStorage backup)
+        async function saveData() {
+            // Always save to localStorage as backup
             localStorage.setItem('speedDialData', JSON.stringify(categories));
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(categories)
+                });
+                if (!response.ok) {
+                    console.error('Failed to save to server');
+                }
+            } catch (error) {
+                console.error('Error saving to server:', error);
+            }
         }
 
         // Get icon URL
@@ -1146,7 +1134,6 @@
                     <div class="category-header">
                         <div class="category-title">
                             ${category.name}
-                            <span class="category-count">${category.bookmarks.length}</span>
                         </div>
                         <div class="category-actions">
                             <button class="btn btn-ghost btn-small" onclick="openEditCategoryModal('${category.id}')">Edit</button>

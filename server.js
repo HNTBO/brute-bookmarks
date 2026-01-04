@@ -20,6 +20,11 @@ app.use('/icons', express.static('icons'));
 const ICONS_DIR = path.join(__dirname, 'icons');
 fs.mkdir(ICONS_DIR, { recursive: true }).catch(console.error);
 
+// Ensure data directory exists for persistent storage
+const DATA_DIR = path.join(__dirname, 'data');
+const BOOKMARKS_FILE = path.join(DATA_DIR, 'bookmarks.json');
+fs.mkdir(DATA_DIR, { recursive: true }).catch(console.error);
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: async (req, file, cb) => {
@@ -270,6 +275,59 @@ app.post('/api/get-favicon', async (req, res) => {
     } catch (error) {
         console.error('Error fetching favicon:', error.message);
         res.status(500).json({ error: 'Failed to fetch favicon' });
+    }
+});
+
+// Default categories for new users
+const DEFAULT_CATEGORIES = [
+    {
+        id: 'productivity',
+        name: 'Productivity',
+        bookmarks: [
+            { id: 'b1', title: 'Clockify', url: 'https://app.clockify.me', iconPath: null },
+            { id: 'b2', title: 'Todoist', url: 'https://todoist.com', iconPath: null },
+            { id: 'b3', title: 'Notion', url: 'https://www.notion.so', iconPath: null }
+        ]
+    },
+    {
+        id: 'google',
+        name: 'Google Services',
+        bookmarks: [
+            { id: 'g1', title: 'Gmail', url: 'https://mail.google.com', iconPath: null },
+            { id: 'g2', title: 'Google Drive', url: 'https://drive.google.com', iconPath: null },
+            { id: 'g3', title: 'Google Calendar', url: 'https://calendar.google.com', iconPath: null }
+        ]
+    }
+];
+
+// API: Get bookmark data
+app.get('/api/data', async (req, res) => {
+    try {
+        const data = await fs.readFile(BOOKMARKS_FILE, 'utf8');
+        res.json(JSON.parse(data));
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            // File doesn't exist, return default categories
+            res.json(DEFAULT_CATEGORIES);
+        } else {
+            console.error('Error reading bookmark data:', error.message);
+            res.status(500).json({ error: 'Failed to load data' });
+        }
+    }
+});
+
+// API: Save bookmark data
+app.post('/api/data', async (req, res) => {
+    try {
+        const data = req.body;
+        if (!Array.isArray(data)) {
+            return res.status(400).json({ error: 'Data must be an array of categories' });
+        }
+        await fs.writeFile(BOOKMARKS_FILE, JSON.stringify(data, null, 2), 'utf8');
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error saving bookmark data:', error.message);
+        res.status(500).json({ error: 'Failed to save data' });
     }
 });
 
