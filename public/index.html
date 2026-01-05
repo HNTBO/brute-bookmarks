@@ -237,9 +237,24 @@
             color: var(--text-primary);
         }
 
-        .category-actions {
-            display: flex;
-            gap: var(--space-xs);
+        .category-edit-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: var(--space-xs);
+            transition: all 0.2s ease;
+            opacity: 0.5;
+        }
+
+        .category-header:hover .category-edit-btn {
+            opacity: 1;
+        }
+
+        .category-edit-btn:hover {
+            color: var(--accent);
+            transform: scale(1.1);
         }
 
         /* Bookmark Grid - Asymmetric */
@@ -674,6 +689,31 @@
             box-shadow: var(--shadow-accent);
         }
 
+        .modal-btn.delete {
+            background: transparent;
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .modal-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border);
+            gap: var(--space-md);
+        }
+
+        .modal-actions-right {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
         /* Empty state */
         .empty-state {
             text-align: center;
@@ -908,6 +948,13 @@
             transform: scale(1.2);
             box-shadow: 0 0 0 4px var(--accent-glow);
         }
+
+        /* Category drop zone styles */
+        .category.drop-target .bookmarks-grid {
+            outline: 2px dashed var(--accent);
+            outline-offset: 4px;
+            background: var(--accent-glow);
+        }
     </style>
 </head>
 <body>
@@ -1003,7 +1050,7 @@
         </div>
     </div>
 
-    <!-- Add Category Modal -->
+    <!-- Add/Edit Category Modal -->
     <div id="category-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1016,10 +1063,14 @@
                         <label>Category Name</label>
                         <input type="text" id="category-name" required placeholder="Work, Social, Tools...">
                     </div>
+                    <input type="hidden" id="editing-category-id">
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="modal-btn cancel" onclick="closeCategoryModal()">Cancel</button>
-                    <button type="submit" class="modal-btn save">Create Category</button>
+                    <button type="button" class="modal-btn delete" id="delete-category-btn" onclick="deleteCategoryFromModal()" style="display: none;">Delete</button>
+                    <div class="modal-actions-right">
+                        <button type="button" class="modal-btn cancel" onclick="closeCategoryModal()">Cancel</button>
+                        <button type="submit" class="modal-btn save">Create Category</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -1130,17 +1181,15 @@
             categories.forEach(category => {
                 const categoryEl = document.createElement('div');
                 categoryEl.className = 'category';
+                categoryEl.dataset.categoryId = category.id;
                 categoryEl.innerHTML = `
                     <div class="category-header">
                         <div class="category-title">
                             ${category.name}
                         </div>
-                        <div class="category-actions">
-                            <button class="btn btn-ghost btn-small" onclick="openEditCategoryModal('${category.id}')">Edit</button>
-                            <button class="btn btn-ghost btn-small btn-danger" onclick="deleteCategory('${category.id}')">Delete</button>
-                        </div>
+                        <button class="category-edit-btn" onclick="openEditCategoryModal('${category.id}')" title="Edit category">✎</button>
                     </div>
-                    <div class="bookmarks-grid" data-category-id="${category.id}">
+                    <div class="bookmarks-grid" data-category-id="${category.id}" style="grid-template-columns: repeat(auto-fill, minmax(${currentCardSize}px, 1fr))">
                         ${category.bookmarks.map((bookmark, index) => `
                             <div class="bookmark-card"
                                  draggable="true"
@@ -1162,7 +1211,7 @@
                 `;
                 container.appendChild(categoryEl);
 
-                // Add drag and drop event listeners
+                // Add drag and drop event listeners for bookmark cards
                 const bookmarkCards = categoryEl.querySelectorAll('.bookmark-card:not(.add-bookmark)');
                 bookmarkCards.forEach(card => {
                     card.addEventListener('dragstart', handleDragStart);
@@ -1171,6 +1220,11 @@
                     card.addEventListener('drop', handleDrop);
                     card.addEventListener('dragleave', handleDragLeave);
                 });
+
+                // Add drag and drop event listeners for category containers (cross-category drag)
+                categoryEl.addEventListener('dragover', handleCategoryDragOver);
+                categoryEl.addEventListener('dragleave', handleCategoryDragLeave);
+                categoryEl.addEventListener('drop', handleCategoryDrop);
             });
         }
 
@@ -1199,6 +1253,10 @@
             e.currentTarget.classList.remove('dragging');
             document.querySelectorAll('.bookmark-card').forEach(card => {
                 card.classList.remove('drag-over');
+            });
+            // Also remove drop-target class from categories
+            document.querySelectorAll('.category').forEach(cat => {
+                cat.classList.remove('drop-target');
             });
         }
 
@@ -1229,7 +1287,7 @@
                 return false;
             }
 
-            // Only allow reordering within the same category
+            // Same category reordering
             if (draggedBookmark.categoryId === targetCategoryId) {
                 const category = categories.find(c => c.id === targetCategoryId);
                 if (!category) return false;
@@ -1247,10 +1305,83 @@
                     saveData();
                     renderCategories();
                 }
+            } else {
+                // Cross-category movement - drop onto a specific bookmark position
+                const sourceCategory = categories.find(c => c.id === draggedBookmark.categoryId);
+                const targetCategory = categories.find(c => c.id === targetCategoryId);
+                
+                if (!sourceCategory || !targetCategory) return false;
+
+                const sourceIndex = sourceCategory.bookmarks.findIndex(b => b.id === draggedBookmark.bookmarkId);
+                const targetIndex = targetCategory.bookmarks.findIndex(b => b.id === targetBookmarkId);
+
+                if (sourceIndex !== -1 && targetIndex !== -1) {
+                    // Remove from source category
+                    const [movedBookmark] = sourceCategory.bookmarks.splice(sourceIndex, 1);
+                    // Insert at target position in new category
+                    targetCategory.bookmarks.splice(targetIndex, 0, movedBookmark);
+
+                    saveData();
+                    renderCategories();
+                }
             }
 
             targetElement.classList.remove('drag-over');
             return false;
+        }
+
+        // Category-level drag handlers for cross-category movement
+        function handleCategoryDragOver(e) {
+
+            if (!draggedBookmark) return;
+            
+            // Don't highlight if dragging within the same category
+            const categoryId = e.currentTarget.dataset.categoryId;
+            if (categoryId === draggedBookmark.categoryId) return;
+            
+            e.preventDefault();
+            e.currentTarget.classList.add('drop-target');
+        }
+
+        function handleCategoryDragLeave(e) {
+            // Only remove if we're leaving the category element itself
+            const relatedTarget = e.relatedTarget;
+            if (relatedTarget && e.currentTarget.contains(relatedTarget)) {
+                return;
+            }
+            e.currentTarget.classList.remove('drop-target');
+        }
+
+        function handleCategoryDrop(e) {
+
+            if (!draggedBookmark) return;
+            
+            const targetCategoryId = e.currentTarget.dataset.categoryId;
+            
+            // Don't move to same category via category drop
+            if (targetCategoryId === draggedBookmark.categoryId) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const sourceCategory = categories.find(c => c.id === draggedBookmark.categoryId);
+            const targetCategory = categories.find(c => c.id === targetCategoryId);
+            
+            if (!sourceCategory || !targetCategory) return;
+
+            const sourceIndex = sourceCategory.bookmarks.findIndex(b => b.id === draggedBookmark.bookmarkId);
+            
+            if (sourceIndex !== -1) {
+                // Remove from source category
+                const [movedBookmark] = sourceCategory.bookmarks.splice(sourceIndex, 1);
+                // Add to end of target category
+                targetCategory.bookmarks.push(movedBookmark);
+
+                saveData();
+                renderCategories();
+            }
+            
+            e.currentTarget.classList.remove('drop-target');
         }
 
         // Modal functions
@@ -1312,6 +1443,9 @@
             editingCategoryId = null;
             document.getElementById('category-modal').querySelector('h2').textContent = 'New Category';
             document.getElementById('category-name').value = '';
+            document.getElementById('editing-category-id').value = '';
+            document.getElementById('delete-category-btn').style.display = 'none';
+            document.querySelector('#category-form .modal-btn.save').textContent = 'Create Category';
             document.getElementById('category-modal').classList.add('active');
         }
 
@@ -1322,12 +1456,26 @@
 
             document.getElementById('category-modal').querySelector('h2').textContent = 'Edit Category';
             document.getElementById('category-name').value = category.name;
+            document.getElementById('editing-category-id').value = categoryId;
+            document.getElementById('delete-category-btn').style.display = 'block';
+            document.querySelector('#category-form .modal-btn.save').textContent = 'Save Changes';
             document.getElementById('category-modal').classList.add('active');
         }
 
         function closeCategoryModal() {
             document.getElementById('category-modal').classList.remove('active');
         }
+
+        function deleteCategoryFromModal() {
+            const categoryId = document.getElementById('editing-category-id').value;
+            if (categoryId && confirm('Delete this category and all its bookmarks?')) {
+                categories = categories.filter(c => c.id !== categoryId);
+                saveData();
+                renderCategories();
+                closeCategoryModal();
+            }
+        }
+
 
         // Icon handling functions
         async function handleUrlChange() {
