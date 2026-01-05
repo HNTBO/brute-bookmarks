@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRID — Bookmarks</title>
+    <title>Brute Bookmarks</title>
 
     <!-- Distinctive Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,6 +54,30 @@
             --shadow-accent: 4px 4px 0 var(--accent);
         }
 
+        /* Solarized Light Theme */
+        [data-theme="light"] {
+            --bg-primary: #fdf6e3;    /* Base3 */
+            --bg-secondary: #eee8d5;  /* Base2 */
+            --bg-card: #fdf6e3;       /* Base3 */
+            --bg-hover: #eee8d5;      /* Base2 */
+
+            --text-primary: #586e75;  /* Base01 */
+            --text-secondary: #93a1a1; /* Base1 */
+            --text-muted: #93a1a1;    /* Base1 */
+
+            --accent: #b58900;        /* Yellow */
+            --accent-dim: #946f00;    /* Darker Yellow */
+            --accent-glow: rgba(181, 137, 0, 0.15);
+
+            --border: #93a1a1;        /* Base1 */
+            --border-strong: #b58900; /* Yellow */
+
+            --shadow-sm: 4px 4px 0 rgba(0,0,0,0.05);
+            --shadow-md: 6px 6px 0 rgba(0,0,0,0.05);
+            --shadow-lg: 8px 8px 0 rgba(0,0,0,0.02);
+            --shadow-accent: 4px 4px 0 var(--accent);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -86,53 +110,124 @@
         }
 
         .container {
-            max-width: 1600px;
+            max-width: var(--page-width, 1600px);
             margin: 0 auto;
             padding: var(--space-xl);
+            transition: max-width 0.2s ease;
         }
 
-        /* Header - Editorial style */
-        header {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: end;
-            gap: var(--space-xl);
-            padding-bottom: var(--space-xl);
-            margin-bottom: var(--space-xl);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .brand {
+        /* Brute Header */
+        .brute-header {
             display: flex;
-            flex-direction: column;
-            gap: var(--space-xs);
+            align-items: stretch;
+            gap: 0;
+            margin-bottom: var(--space-xl);
+            border: 1px solid var(--accent);
+            height: 100px;
         }
 
-        .brand-label {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--accent);
+        .header-title-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--space-lg);
+            border-right: 1px solid var(--accent);
         }
 
-        h1 {
+        .header-title-box h1 {
             font-family: var(--font-display);
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
             font-weight: 400;
             letter-spacing: -0.02em;
-            line-height: 0.95;
+            line-height: 1;
+            color: var(--text-primary);
+        }
+
+        .header-title-box h1 em {
+            font-style: normal;
+            color: var(--text-secondary);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: stretch;
+        }
+
+        /* 2D Size Controller */
+        .size-controller {
+            width: 200px;
+            height: 100%;
+            background: var(--bg-hover);
+            position: relative;
+            cursor: crosshair;
+            border-right: 1px solid var(--accent);
+        }
+
+        .size-handle {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            cursor: grab;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+            transition: box-shadow 0.15s ease;
+        }
+
+        .size-handle:hover {
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+
+        .size-handle.dragging {
+            cursor: grabbing;
+            box-shadow: 0 0 0 6px var(--accent-glow);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 40px;
+            flex: 1;
+            background: var(--bg-secondary);
+            border: none;
+            border-bottom: 1px solid var(--accent);
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:last-child {
+            border-bottom: none;
+        }
+
+        .action-btn:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        /* Legacy h1 styles for modals */
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            line-height: 1;
             color: var(--text-primary);
         }
 
         h1 em {
             font-style: normal;
             color: var(--text-secondary);
-        }
-
-        .controls {
-            display: flex;
-            gap: var(--space-sm);
         }
 
         /* Buttons - Brutalist */
@@ -223,38 +318,40 @@
 
         .category-header {
             display: flex;
-            justify-content: space-between;
-            align-items: baseline;
+            align-items: stretch;
             margin-bottom: var(--space-lg);
-            padding-bottom: var(--space-sm);
-            border-bottom: 1px solid var(--border);
+            border: 1px solid var(--accent);
+            height: 44px;
+        }
+
+        .category-edit-btn {
+            background: var(--bg-secondary);
+            border: none;
+            border-left: 1px solid var(--accent);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .category-edit-btn:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
         }
 
         .category-title {
             font-family: var(--font-display);
-            font-size: 1.75rem;
+            font-size: 1.25rem;
             font-weight: 400;
             color: var(--text-primary);
-        }
-
-        .category-edit-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 1rem;
-            padding: var(--space-xs);
-            transition: all 0.2s ease;
-            opacity: 0.5;
-        }
-
-        .category-header:hover .category-edit-btn {
-            opacity: 1;
-        }
-
-        .category-edit-btn:hover {
-            color: var(--accent);
-            transform: scale(1.1);
+            padding: 0 var(--space-md);
+            display: flex;
+            align-items: center;
+            flex: 1;
         }
 
         /* Bookmark Grid - Asymmetric */
@@ -714,6 +811,55 @@
             gap: var(--space-sm);
         }
 
+        /* Settings Modal Styles */
+        .settings-section {
+            margin-bottom: var(--space-lg);
+        }
+
+        .settings-section h3 {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) 0;
+            gap: var(--space-md);
+        }
+
+        .settings-row label {
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .settings-row input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        /* Card name visibility */
+        .bookmark-card.hide-title .bookmark-title {
+            display: none;
+        }
+
+        .bookmark-card.hide-title {
+            justify-content: center;
+        }
+
+        .bookmark-card.hide-title .bookmark-icon {
+            margin-bottom: 0;
+        }
+
         /* Empty state */
         .empty-state {
             text-align: center;
@@ -892,62 +1038,7 @@
             box-shadow: 2px 2px 0 var(--accent-dim);
         }
 
-        /* Card size control */
-        .size-control {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-            margin-right: var(--space-md);
-        }
 
-        .size-control label {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-        }
-
-        .size-slider {
-            width: 120px;
-            height: 4px;
-            background: var(--border);
-            border: none;
-            outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-            cursor: pointer;
-        }
-
-        .size-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            background: var(--accent);
-            cursor: pointer;
-            border: 1px solid var(--accent);
-            transition: all 0.2s ease;
-        }
-
-        .size-slider::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            background: var(--accent);
-            cursor: pointer;
-            border: 1px solid var(--accent);
-            transition: all 0.2s ease;
-        }
-
-        .size-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-            box-shadow: 0 0 0 4px var(--accent-glow);
-        }
-
-        .size-slider::-moz-range-thumb:hover {
-            transform: scale(1.2);
-            box-shadow: 0 0 0 4px var(--accent-glow);
-        }
 
         /* Category drop zone styles */
         .category.drop-target .bookmarks-grid {
@@ -959,18 +1050,19 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="brand">
-                <h1>Bookmark <em>Grid</em></h1>
+        <header class="brute-header">
+            <div class="header-title-box">
+                <h1>Brute <em>Bookmarks</em></h1>
             </div>
-            <div class="controls">
-                <div class="size-control">
-                    <label for="card-size">Size</label>
-                    <input type="range" id="card-size" class="size-slider" min="120" max="240" value="160" step="10" oninput="updateCardSize(this.value)">
+            <div class="header-controls">
+                <div class="size-controller" id="size-controller">
+                    <div class="size-handle" id="size-handle"></div>
                 </div>
-                <button class="btn btn-primary" onclick="openAddCategoryModal()">+ Category</button>
-                <button class="btn" onclick="exportData()">Export</button>
-                <button class="btn" onclick="importData()">Import</button>
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="openAddCategoryModal()" title="Add Category">+</button>
+                    <button class="action-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Theme">☀</button>
+                    <button class="action-btn" onclick="openSettingsModal()" title="Settings">⚙</button>
+                </div>
             </div>
         </header>
 
@@ -979,7 +1071,7 @@
         </div>
 
         <footer>
-            <span class="footer-text">Bookmark Grid — <a href="#">v1.0</a></span>
+            <span class="footer-text">Brute Bookmarks — <a href="#">v1.0</a></span>
             <span class="footer-text">Icons via <a href="https://commons.wikimedia.org" target="_blank">Wikimedia Commons</a></span>
         </footer>
     </div>
@@ -1076,6 +1168,32 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="modal-close" onclick="closeSettingsModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3>Display</h3>
+                    <div class="settings-row">
+                        <label for="show-card-names">Show Card Names</label>
+                        <input type="checkbox" id="show-card-names" checked onchange="toggleCardNames(this.checked)">
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>Data</h3>
+                    <div class="settings-row">
+                        <button class="btn" onclick="exportData()">Export Bookmarks</button>
+                        <button class="btn" onclick="importData()">Import Bookmarks</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // API base URL
         const API_BASE = window.location.origin;
@@ -1085,14 +1203,139 @@
         let selectedIconUrl = null;
         let selectedIconPath = null;
         let currentCardSize = 160;
+        let currentPageWidth = 100; // percentage
+        let currentTheme = 'dark';
+        let showCardNames = true;
 
-        // Update card size
+        // Theme Toggle
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            
+            // Update button icon
+            const btn = document.getElementById('theme-toggle-btn');
+            btn.innerHTML = currentTheme === 'dark' ? '☀' : '☾';
+        }
+
+        // Settings Modal
+        function openSettingsModal() {
+            document.getElementById('settings-modal').classList.add('active');
+            document.getElementById('show-card-names').checked = showCardNames;
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.remove('active');
+        }
+
+        // Card Names Toggle
+        function toggleCardNames(show) {
+            showCardNames = show;
+            localStorage.setItem('showCardNames', showCardNames);
+            renderCategories();
+        }
+
+        // Update card size (X-axis)
         function updateCardSize(size) {
             currentCardSize = parseInt(size);
             document.querySelectorAll('.bookmarks-grid').forEach(grid => {
                 grid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${currentCardSize}px, 1fr))`;
             });
             localStorage.setItem('cardSize', currentCardSize);
+        }
+
+        // Update page width (Y-axis)
+        function updatePageWidth(width) {
+            currentPageWidth = width;
+            document.documentElement.style.setProperty('--page-width', `${800 + (currentPageWidth / 100) * 800}px`);
+            localStorage.setItem('pageWidth', currentPageWidth);
+        }
+
+        // 2D Size Controller
+        function initSizeController() {
+            const controller = document.getElementById('size-controller');
+            const handle = document.getElementById('size-handle');
+            let isDragging = false;
+
+            // Calculate handle position from current values
+            function updateHandlePosition() {
+                const rect = controller.getBoundingClientRect();
+                // X: cardSize maps 120-240 to 0-100%
+                const xPercent = ((currentCardSize - 120) / 120) * 100;
+                // Y: pageWidth maps 100-50 to 0-100% (inverted - top = wider)
+                const yPercent = ((100 - currentPageWidth) / 50) * 100;
+                
+                handle.style.left = `${Math.max(8, Math.min(rect.width - 8, (xPercent / 100) * rect.width))}px`;
+                handle.style.top = `${Math.max(8, Math.min(rect.height - 8, (yPercent / 100) * rect.height))}px`;
+            }
+
+            function startDrag(e) {
+                isDragging = true;
+                handle.classList.add('dragging');
+                e.preventDefault();
+            }
+
+            function onDrag(e) {
+                if (!isDragging) return;
+                
+                const rect = controller.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                // Calculate percentages
+                let xPercent = ((clientX - rect.left) / rect.width) * 100;
+                let yPercent = ((clientY - rect.top) / rect.height) * 100;
+                
+                // Clamp values
+                xPercent = Math.max(0, Math.min(100, xPercent));
+                yPercent = Math.max(0, Math.min(100, yPercent));
+                
+                // Convert to actual values
+                // X: 0-100% maps to 120-240px card size
+                const newCardSize = Math.round(120 + (xPercent / 100) * 120);
+                // Y: 0-100% maps to 100-50% page width (inverted)
+                const newPageWidth = Math.round(100 - (yPercent / 100) * 50);
+                
+                updateCardSize(newCardSize);
+                updatePageWidth(newPageWidth);
+                updateHandlePosition();
+            }
+
+            function stopDrag() {
+                isDragging = false;
+                handle.classList.remove('dragging');
+            }
+
+            // Mouse events
+            handle.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', stopDrag);
+
+            // Touch events
+            handle.addEventListener('touchstart', startDrag);
+            document.addEventListener('touchmove', onDrag);
+            document.addEventListener('touchend', stopDrag);
+
+            // Click on controller to jump handle
+            controller.addEventListener('click', (e) => {
+                if (e.target === handle) return;
+                const rect = controller.getBoundingClientRect();
+                let xPercent = ((e.clientX - rect.left) / rect.width) * 100;
+                let yPercent = ((e.clientY - rect.top) / rect.height) * 100;
+                
+                xPercent = Math.max(0, Math.min(100, xPercent));
+                yPercent = Math.max(0, Math.min(100, yPercent));
+                
+                const newCardSize = Math.round(120 + (xPercent / 100) * 120);
+                const newPageWidth = Math.round(100 - (yPercent / 100) * 50);
+                
+                updateCardSize(newCardSize);
+                updatePageWidth(newPageWidth);
+                updateHandlePosition();
+            });
+
+            // Initial position
+            setTimeout(updateHandlePosition, 0);
         }
 
         // Initialize with data from server
@@ -1116,19 +1359,41 @@
                 }
             }
 
-            // Restore saved card size (keep in localStorage as it's a UI preference)
+            // Restore saved card size
             const savedSize = localStorage.getItem('cardSize');
             if (savedSize) {
                 currentCardSize = parseInt(savedSize);
-                document.getElementById('card-size').value = currentCardSize;
             }
+
+            // Restore saved page width
+            const savedPageWidth = localStorage.getItem('pageWidth');
+            if (savedPageWidth) {
+                currentPageWidth = parseInt(savedPageWidth);
+            }
+
+            // Restore theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                currentTheme = savedTheme;
+            }
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            document.getElementById('theme-toggle-btn').innerHTML = currentTheme === 'dark' ? '☀' : '☾';
+
+            // Restore card names setting
+            const savedShowCardNames = localStorage.getItem('showCardNames');
+            if (savedShowCardNames !== null) {
+                showCardNames = savedShowCardNames === 'true';
+            }
+            document.getElementById('show-card-names').checked = showCardNames;
 
             renderCategories();
 
-            // Apply saved card size
-            if (savedSize) {
-                updateCardSize(currentCardSize);
-            }
+            // Apply saved settings
+            updateCardSize(currentCardSize);
+            updatePageWidth(currentPageWidth);
+
+            // Initialize the 2D size controller
+            initSizeController();
         }
 
         // Save data to server (with localStorage backup)
@@ -1191,7 +1456,7 @@
                     </div>
                     <div class="bookmarks-grid" data-category-id="${category.id}" style="grid-template-columns: repeat(auto-fill, minmax(${currentCardSize}px, 1fr))">
                         ${category.bookmarks.map((bookmark, index) => `
-                            <div class="bookmark-card"
+                            <div class="bookmark-card ${!showCardNames ? 'hide-title' : ''}"
                                  draggable="true"
                                  data-bookmark-id="${bookmark.id}"
                                  data-category-id="${category.id}"
