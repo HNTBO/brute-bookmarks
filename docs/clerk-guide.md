@@ -1,4 +1,4 @@
-# Clerk Authentication Guide for Bookmark Grid
+# Clerk Authentication Guide for Brute Bookmarks
 
 Complete guide to implement Clerk authentication, replacing Nginx Basic Auth.
 
@@ -38,7 +38,7 @@ Complete guide to implement Clerk authentication, replacing Nginx Basic Auth.
 
 1. Go to [clerk.com](https://clerk.com) and sign up/sign in
 2. Click **"Create application"**
-3. Name it **"Bookmark Grid"**
+3. Name it **"Brute Bookmarks"**
 4. Enable authentication methods:
    - ✅ **Email** (recommended)
    - ✅ **Google** (optional)
@@ -486,7 +486,7 @@ sudo kill -9 <PID>
 - [ ] Local test passes (http://localhost:3002)
 
 ### Clerk Dashboard
-- [ ] Bookmark Grid application created
+- [ ] Brute Bookmarks application created
 - [ ] Auth methods configured
 - [ ] Allowed origins added
 

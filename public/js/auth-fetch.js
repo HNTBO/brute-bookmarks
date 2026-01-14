@@ -1,5 +1,5 @@
 /**
- * auth-fetch.js - Authenticated fetch wrapper for Bookmark Grid
+ * auth-fetch.js - Authenticated fetch wrapper for Brute Bookmarks
  *
  * This module wraps the native fetch API to automatically include
  * Clerk authentication tokens in requests.

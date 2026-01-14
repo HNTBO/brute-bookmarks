@@ -1,7 +1,7 @@
 /**
  * clerk-auth.js - Clerk authentication middleware for Express
  *
- * This module provides authentication middleware for Bookmark Grid.
+ * This module provides authentication middleware for Brute Bookmarks.
  * All API routes are protected when Clerk is configured.
  */
 

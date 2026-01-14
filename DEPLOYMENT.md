@@ -1,6 +1,6 @@
 # Deployment Guide for bookmarks.fmotion.fr
 
-This guide will help you deploy your Speed Dial bookmark dashboard with Node.js backend to your VPS.
+This guide will help you deploy Brute Bookmarks with Node.js backend to your VPS.
 
 ## Prerequisites
 
@@ -138,7 +138,7 @@ sudo certbot --nginx -d bookmarks.fmotion.fr
 
 ### 7. Verify Deployment
 
-Visit https://bookmarks.fmotion.fr in your browser. You should see your Speed Dial dashboard.
+Visit https://bookmarks.fmotion.fr in your browser. You should see your Brute Bookmarks dashboard.
 
 ## Architecture Overview
 

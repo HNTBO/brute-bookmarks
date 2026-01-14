@@ -1,6 +1,6 @@
-# Bookmarks Speed Dial Dashboard
+# Brute Bookmarks
 
-A beautiful, self-hosted bookmark manager inspired by Speed Dial 2, featuring automatic high-quality icon fetching from Wikimedia Commons, custom icon uploads, and category organization.
+A beautiful, self-hosted bookmark manager featuring automatic high-quality icon fetching from Wikimedia Commons, custom icon uploads, and category organization.
 
 ## Features
 
@@ -211,7 +211,7 @@ MIT
 
 - Icon source: [Wikimedia Commons](https://commons.wikimedia.org)
 - Favicon service: Google Favicon API
-- Inspired by: Speed Dial 2 Chrome Extension
+- Inspired by: Speed Dial 2 Chrome Extension (RIP)
 
 ## Support
 

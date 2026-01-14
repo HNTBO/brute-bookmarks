@@ -1,13 +1,13 @@
 {
-  "name": "bookmark-grid",
+  "name": "brute-bookmarks",
   "version": "1.0.0",
-  "description": "Speed Dial bookmark dashboard with automatic icon fetching",
+  "description": "Self-hosted bookmark dashboard with automatic icon fetching",
   "main": "server.js",
   "scripts": {
     "start": "node -r dotenv/config server.js",
     "dev": "nodemon -r dotenv/config server.js"
   },
-  "keywords": ["bookmarks", "speed-dial", "dashboard"],
+  "keywords": ["bookmarks", "dashboard", "self-hosted"],
   "author": "",
   "license": "MIT",
   "dependencies": {

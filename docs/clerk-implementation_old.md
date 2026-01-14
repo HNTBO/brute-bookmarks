@@ -1,6 +1,6 @@
-# Clerk Authentication Implementation for Bookmark Grid
+# Clerk Authentication Implementation for Brute Bookmarks
 
-This document outlines how to add Clerk authentication to Bookmark Grid.
+This document outlines how to add Clerk authentication to Brute Bookmarks.
 
 ## Files Created
 
@@ -19,7 +19,7 @@ This document outlines how to add Clerk authentication to Bookmark Grid.
 ### Step 1: Create Clerk Account
 
 1. Go to https://clerk.com and sign up
-2. Create a new application named "Bookmark Grid"
+2. Create a new application named "Brute Bookmarks"
 3. Enable Email authentication (and optionally Google, GitHub)
 4. Copy `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`
 
@@ -227,7 +227,7 @@ nginx -t && systemctl reload nginx
 
 ## Notes
 
-- **Same Clerk app**: You can use the same Clerk application for both Storyboard and Bookmark Grid (same credentials work on both)
+- **Same Clerk app**: You can use the same Clerk application for both Storyboard and Brute Bookmarks (same credentials work on both)
 - **Graceful degradation**: If Clerk keys are not set, the app runs without authentication
 - **Password manager**: Clerk's sign-in UI is a proper form that works with password managers
 

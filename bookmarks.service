@@ -1,5 +1,5 @@
 [Unit]
-Description=Bookmarks Speed Dial Dashboard
+Description=Brute Bookmarks Dashboard
 After=network.target
 
 [Service]

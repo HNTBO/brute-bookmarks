@@ -1,5 +1,5 @@
 /**
- * auth.js - Clerk authentication for Bookmark Grid
+ * auth.js - Clerk authentication for Brute Bookmarks
  * Non-blocking: App loads first, then auth overlay appears
  */
 
